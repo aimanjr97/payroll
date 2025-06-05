@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Payslip Generator (iPhone Optimized with Logo)</title>
+  <style>
+    /* Base styles */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      margin: 20px 10px;
+      background: #f5f5f5;
+      color: #222;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .container {
+      max-width: 480px; /* good for iPhone widths */
+      margin: auto;
+      background: #fff;
+      padding: 20px 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 12px 10px;
+      font-size: 1.1rem;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+      -webkit-appearance: none; /* remove ios spinner for number */
+      -moz-appearance: textfield;
+    }
+
+    input[type="number"]::-webkit-inner-spin-button, 
+    input[type="number"]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+
+    button {
+      margin-top: 25px;
+      width: 100%;
+      padding: 14px 0;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.25rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:hover,
+    button:focus {
+      background: #0056b3;
+      outline: none;
+    }
+
+    #payslip {
+      display: none;
+      margin-top: 40px;
+      padding: 20px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      background: white;
+      box-sizing: border-box;
+    }
+
+    /* Company logo styles */
+    #payslip .logo {
+      display: block;
+      margin: 0 auto 20px auto;
+      max-width: 150px;
+      height: auto;
+    }
+
+    .line {
+      margin: 12px 0;
+      font-size: 1.1rem;
+    }
+
+    .label {
+      display: inline-block;
+      width: 40%;
+      font-weight: 700;
+      vertical-align: top;
+      color: #333;
+    }
+
+    .value {
+      display: inline-block;
+      width: 55%;
+      font-weight: 500;
+      color: #555;
+      word-wrap: break-word;
+    }
+
+    .footer {
+      margin-top: 30px;
+      font-size: 0.9rem;
+      color: #444;
+      text-align: center;
+      font-style: italic;
+    }
+
+    .sign-box {
+      margin-top: 50px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .sign-line {
+      width: 45%;
+      border-top: 1px solid #000;
+      padding-top: 8px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 10px;
+      color: #222;
+    }
+
+    .no-print {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    /* Print styles */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #payslip, #payslip * {
+        visibility: visible;
+      }
+      #payslip {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0 20px;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" id="form-container">
+    <h1>Employee Payslip Generator</h1>
+
+    <form onsubmit="generatePayslip(event)" autocomplete="off">
+      <label for="empName">Employee Name:</label>
+      <input type="text" id="empName" name="empName" required />
+
+      <label for="empIC">IC Number:</label>
+      <input type="text" id="empIC" name="empIC" required />
+
+      <label for="empPosition">Position:</label>
+      <input type="text" id="empPosition" name="empPosition" required />
+
+      <label for="payMonth">Pay Month:</label>
+      <input type="text" id="payMonth" name="payMonth" placeholder="e.g. May 2025" required />
+
+      <label for="basicSalary">Basic Salary (RM):</label>
+      <input type="number" id="basicSalary" name="basicSalary" min="0" step="0.01" required />
+
+      <label for="allowance">Allowances (RM):</label>
+      <input type="number" id="allowance" name="allowance" min="0" step="0.01" value="0" />
+
+      <label for="deduction">Deductions (RM):</label>
+      <input type="number" id="deduction" name="deduction" min="0" step="0.01" value="0" />
+
+      <button type="submit">Generate Payslip</button>
+    </form>
+  </div>
+
+  <div class="container" id="payslip">
+    <!-- Company Logo here -->
+    <img src="https://via.placeholder.com/150x60?text=Your+Logo" alt="Company Logo" class="logo" />
+
+    <h2 style="text-align: center;">[Your Company Name Here]</h2>
+    <h3 style="text-align: center; margin-bottom: 25px;">Payslip Document</h3>
+
+    <div class="line"><span class="label">Employee Name:</span><span class="value" id="outName"></span></div>
+    <div class="line"><span class="label">IC Number:</span><span class="value" id="outIC"></span></div>
+    <div class="line"><span class="label">Position:</span><span class="value" id="outPosition"></span></div>
+    <div class="line"><span class="label">Pay Month:</span><span class="value" id="outMonth"></span></div>
+
+    <div class="line"><span class="label">Basic Salary (RM):</span><span class="value" id="outSalary"></span></div>
+    <div class="line"><span class="label">Allowances (RM):</span><span class="value" id="outAllowance"></span></div>
+    <div class="line"><span class="label">Deductions (RM):</span><span class="value" id="outDeduction"></span></div>
+    <div class="line" style="font-weight: 700; font-size: 1.2rem;">
+      <span class="label">Net Pay (RM):</span><span class="value" id="outNetPay"></span>
+    </div>
+
+    <div class="footer">
+      This document is issued as a formal salary confirmation for the above-mentioned employee.
+    </div>
+
+    <div class="sign-box">
+      <div class="sign-line">Authorized Signature</div>
+      <div class="sign-line">Employee Signature</div>
+    </div>
+
+    <div class="no-print">
+      <button onclick="window.print()">🖨️ Print / Save PDF</button>
+    </div>
+  </div>
+
+  <script>
+    function generatePayslip(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('empName').value.trim();
+      const ic = document.getElementById('empIC').value.trim();
+      const position = document.getElementById('empPosition').value.trim();
+      const month = document.getElementById('payMonth').value.trim();
+      const salary = parseFloat(document.getElementById('basicSalary').value) || 0;
+      const allowance = parseFloat(document.getElementById('allowance').value) || 0;
+      const deduction = parseFloat(document.getElementById('deduction').value) || 0;
+      const netpay = (salary + allowance - deduction).toFixed(2);
+
+      document.getElementById('outName').textContent = name;
+      document.getElementById('outIC').textContent = ic;
+      document.getElementById('outPosition').textContent = position;
+      document.getElementById('outMonth').textContent = month;
+      document.getElementById('outSalary').textContent = salary.toFixed(2);
+      document.getElementById('outAllowance').textContent = allowance.toFixed(2);
+      document.getElementById('outDeduction').textContent = deduction.toFixed(2);
+      document.getElementById('outNetPay').textContent = netpay;
+
+      document.getElementById('payslip').style.display = 'block';
+
+      // Scroll to payslip smoothly on small devices
+      setTimeout(() => {
+        document.getElementById('payslip').scrollIntoView({behavior: 'smooth'});
+      }, 100);
+    }
+  </script>
+
+</body>
+</html>
